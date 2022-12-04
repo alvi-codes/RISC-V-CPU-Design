@@ -98,7 +98,8 @@ alu #(3, ADDRESS_WIDTH) alu (
     .ALUop2 (ALUop2),
     .ALUctrl (ALUControlE),
     .ALUout (ALUout),
-    .EQ (EQ)
+    .EQ (EQ),
+    .ZeroE (ZeroE)
 );
 reg_file #(5, DATA_WIDTH)reg_file (
     .clk (clk),
@@ -118,7 +119,6 @@ data_mem #(8, 32) data_mem (
     .WD (RD2E),
     .RD (MEMdata)
 );
-
 memsrc #(ADDRESS_WIDTH) memsrc ( // what does the #(ADDRESS_WIDTH) do
     .ReadDataW (ReadDataW),
     .PCPlus4W (PCPlus4W),

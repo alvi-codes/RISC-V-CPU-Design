@@ -7,6 +7,7 @@ module alu #(
     input logic     [CONTROL_WIDTH-1:0] ALUctrl,
     output logic    [INPUT_WIDTH-1:0]   ALUout,
     output logic                        EQ // 1 if ALUop1 == ALUop2 0 otherwise
+    output logic                        ZeroE // 1 if ALUout == 0, 0 otherwise
 );
 
     always_comb begin
@@ -21,6 +22,7 @@ module alu #(
         3'h7:   ALUout = 0;
         endcase
         assign EQ = (ALUop1 == ALUop2);
+        assign ZeroE = (ALUOut == 32'h0);
     end
     
 endmodule

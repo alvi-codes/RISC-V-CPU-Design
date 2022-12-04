@@ -48,5 +48,9 @@ We worked out a schedule for the project, given below.
 
 ## Documentation for Project Phase III: Pipelined CPU
 
+FUA:
+|Area|Task|Members Involved|
+|CONTROL UNIT|Check if Jump and Branch features exist, if no add them. Then complete pipelining and test. Need to add ZeroE from ALU (done).|Johan|
+|PC|Add DFF for PCPlus4D and PCD (FIRST pipeline stage). Note that PCE + ImmExtE gives PCTargetE. |Shermaine|
 
 ## Documentation for Project Phase IV: Pipelined CPU w Data Cache
