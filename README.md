@@ -47,3 +47,6 @@ We worked out a schedule for the project, given below.
 ## Documentation for Project Phase II: Single-Cycle CPU
 
 ## Documentation for Project Phase III: Pipelined CPU
+
+
+## Documentation for Project Phase IV: Pipelined CPU w Data Cache

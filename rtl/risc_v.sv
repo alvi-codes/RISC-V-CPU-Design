@@ -30,8 +30,6 @@ logic [4:0]               rs1, rs2, rd;
 logic [2:0]               ALUctrl;
 logic                     JALsrc, JALRsrc;
 
-
-
 //Top_CU
 logic   [DATA_WIDTH-1:0]    instr;
 logic   [1:0]              ImmSrc;
@@ -90,15 +88,15 @@ pcReg #(ADDRESS_WIDTH) pcReg(
 logic [ADDRESS_WIDTH-1:0] ALUop1, ALUop2, regOp2, ALUout, MEMdata, RegData;
 
 alusrc #(ADDRESS_WIDTH) alusrc (
-    .regOp2 (regOp2),
-    .ImmOp (ImmOp),
-    .ALUsrc (ALUsrc),
+    .regOp2 (RD2E),
+    .ImmOp (ImmExtE),
+    .ALUsrc (ALUSrcE),
     .ALUop2 (ALUop2)
 );
 alu #(3, ADDRESS_WIDTH) alu (
-    .ALUop1 (ALUop1),
+    .ALUop1 (RD1E),
     .ALUop2 (ALUop2),
-    .ALUctrl (ALUctrl),
+    .ALUctrl (ALUControlE),
     .ALUout (ALUout),
     .EQ (EQ)
 );
@@ -108,7 +106,7 @@ reg_file #(5, DATA_WIDTH)reg_file (
     .AD2 (rs2),
     .AD3 (rd),
     .WE3 (RegWrite),
-    .WD3 (JALsrc ? (pc) : (MEMsrc ? MEMdata : ALUout)),
+    .WD3 (JALsrc ? (pc) : (ResultW)), // changed to ResultW using memsrc mux
     .RD1 (ALUop1),
     .RD2 (regOp2),
     .a0 (a0)
@@ -116,12 +114,92 @@ reg_file #(5, DATA_WIDTH)reg_file (
 data_mem #(8, 32) data_mem (
     .clk (clk),
     .WE (MEMWrite),
-    .A (ALUout[7:0]),
-    .WD (regOp2),
+    .A (ALUResultM[7:0]),
+    .WD (RD2E),
     .RD (MEMdata)
+);
+
+memsrc #(ADDRESS_WIDTH) memsrc ( // what does the #(ADDRESS_WIDTH) do
+    .ReadDataW (ReadDataW),
+    .PCPlus4W (PCPlus4W),
+    .MEMSrcW (MEMSrcW),
+    .ResultW (ResultW)
 );
 
 assign pc_addr = pc[7:0];
 assign instruction = instr;
+
+// Pipelining
+
+// Pipeline Stage E
+logic                     RegWriteE, MEMWriteE, JumpE, BranchE, ALUSrcE;
+logic [1:0]               MEMSrcE;
+logic [2:0]               ALUControlE;
+logic [ADDRESS_WIDTH-1:0] RD1E, RD2E, PCE, RdE, ImmExtE, PCPlus4E;
+
+always_ff @ (posedge clk) begin
+
+    // stage D->E (ctrl unit | register file | sign extend (D) -> ALU (E))
+
+    // ctrl unit
+    RegWriteE <= RegWrite;
+    MEMSrcE <= MEMsrc;
+    MEMWriteE <= MEMWrite;
+    // JumpE yet to be added, missing JumpD.  
+    // BranchE yet to be added, missing BranchD 
+    ALUControlE <= ALUctrl;
+    ALUSrcE <= ALUsrc;
+
+    // alu
+    RD1E <= ALUOp1;
+    RD2E <= regOp2;
+    // PCE yet to be added, missing PCD. @shermaine Note that PCE and ImmExtE should be added to give PCTargetE 
+    RdE <= instr[11:7];
+    ImmExtE <= ImmOp;
+    // PCPlus4E yet to be added, missing PCPlus4D. PCPlus4D comes from a DFF in the PC. We can discuss + do this on the 5th
+
+end
+
+// Pipeline Stage F
+logic                     RegWriteM, MEMWriteM;
+logic [1:0]               MEMSrcM;
+logic [ADDRESS_WIDTH-1:0] ALUResultM, WriteDataM, RdM, PCPlus4M;
+
+always_ff @ (posedge clk) begin
+
+    // stage F->M (ALU (E) -> Data Memory (M))
+
+    // ctrl unit
+    RegWriteM <= RegWriteE;
+    MEMSrcM <= MEMSrcE;
+    MEMWriteM <= MEMWriteE;
+
+    // alu
+    ALUResultM <= ALUout;
+    WriteDataM <= RD2E; // RD2E == WriteDataE
+    RdM <= RdE;
+    PCPlus4M <= PCPlus4E; // note missing PCPlus4D
+
+end
+
+// Pipeline Stage F
+logic                     RegWriteW;
+logic [1:0]               MEMSrcW;
+logic [ADDRESS_WIDTH-1:0] ReadDataW, RdW, PCPlus4W, ALUResultW;
+
+always_ff @ (posedge clk) begin
+
+    // stage M->W (Data Memory (M) -> PC (W))
+
+    // ctrl unit
+    RegWriteW <= RegWriteM;
+    MEMSrcW <= MEMSrcM;
+
+    //alu
+    ALUResultW <= ALUResultM;
+    ReadDataW <= MEMdata;
+    RdW <= RdM;
+    PCPlus4W <= PCPlus4M;
+end
 
 endmodule
