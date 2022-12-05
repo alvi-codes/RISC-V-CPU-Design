@@ -29,6 +29,7 @@ logic [ADDRESS_WIDTH-1:0] ImmOp, pc;
 logic [4:0]               rs1, rs2, rd;
 logic [2:0]               ALUctrl;
 logic                     JALsrc, JALRsrc;
+logic                     JALsrc, JALRsrc;
 
 //Top_CU
 logic   [DATA_WIDTH-1:0]    instr;
