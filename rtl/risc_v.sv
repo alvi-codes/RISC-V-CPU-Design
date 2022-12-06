@@ -12,7 +12,7 @@
 
 // create top level module
 module risc_v #(
-    parameter ADDRESS_WIDTH = 32,
+    parameter ADDRESS_WIDTH = 8,
     parameter DATA_WIDTH = 32
 )(
     input logic clk,
@@ -54,23 +54,69 @@ always_ff @(posedge clk)
 
 // DATA Block
 
-/*
-    Todo:
-        1) First create logics for each wire to be used in Data block
-        2) Use the right components from ones included as in the diagram
-        3) Fill the always_ff block by with: Execute block logic = Data block logic
-        4) Assign a0 to right value from the register
 
-    Remember:
-        * All logic in your block must always end with D. example: RdD
-        * Each logic in always_ff must have same name with different suffix, example JumpE = JumpD
-        * always_ff block has been created, just fill in
-*/
+logic [31:0]    instrD;
+logic           RegWriteD;
+logic [1:0]     ResultSrcD;
+logic           MemWriteD;
+logic           JumpD;
+logic           BranchD;
+logic [2:0]     ALUControlD;
+logic           ALUSrcD;
+logic [1:0]     ImmSrcD;
+logic [31:0]    RD1D, RD2D;
+logic [ADDRESS_WIDTH-1:0]   PCD, PCPlus4D;
+logic           RdD;
+logic           ImmExtD;
+logic [DATA_WIDTH-1:0]  a0;
+
+
+control_unit #(DATA_WIDTH) my_control_unit(
+    .instr (instrD),
+    .RegWrite (RegWriteD),
+    .ResultSrc (ResultSrcD),
+    .MemWrite (MemWriteD),
+    .Jump (JumpD),
+    .Branch (BranchD),
+    .ALUControl (ALUControlD),
+    .ALUsrc (ALUSrcD),
+    .ImmSrc (ImmSrcD)
+);
+
+reg_file #(5, DATA_WIDTH)reg_file (
+    .clk (clk),
+    .AD1 (instrD[19:15]),
+    .AD2 (instrD[24:20]),
+    .AD3 (RdW),
+    .WE3 (RegWriteW),
+    .WD3 (ResultW),
+    .RD1 (RD1D),
+    .RD2 (RD2D),
+    .a0 (a0)
+);
+
+sign_extend #(DATA_WIDTH) my_sign_extend(
+    .instr (instrD),
+    .ImmSrc (ImmSrcD),    
+    .ImmOp (ImmExtD)
+);
+
 
 always_ff @(posedge clk)
     begin
-        //Only add logic which must be going into the next block
-        //Once done remove all comments for your block and add any comments if neccessary
+        RegWriteE = RegWriteD;
+        ResultSrcE = ResultSrcD;
+        MemWriteE = MemWriteD;
+        JumpE = JumpD;
+        BranchE = BranchD;
+        ALUControlE = ALUControlD;
+        ALUSrcE = ALUSrcD;
+        RD1E = RD1D;
+        RD2D = RD2D;
+        PCE = PCD;
+        RdE = RdD;
+        ImmExtE = ImmExtD;
+        PCPlus4E = PCPlus4D;
     end
 
 

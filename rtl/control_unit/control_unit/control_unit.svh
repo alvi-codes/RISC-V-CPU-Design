@@ -5,7 +5,7 @@ module control_unit #(
     input   logic   [DATA_WIDTH-1:0]    instr,
     output  logic                       RegWrite,
     output  logic   [1:0]               ResultSrc,
-    output  logic                       MEMWrite,
+    output  logic                       MemWrite,
     output  logic                       Jump,
     output  logic                       Branch,
     output  logic   [2:0]               ALUControl,
