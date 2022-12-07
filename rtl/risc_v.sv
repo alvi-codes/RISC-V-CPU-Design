@@ -2,12 +2,12 @@
 `include "control_unit/instr_mem/instr_mem.svh"
 `include "control_unit/control_unit/control_unit.svh"
 `include "control_unit/sign_extend/sign_extend.svh"
-`include "pc/pc_mux.svh"
+`include "pc/adder.svh"
 `include "pc/pcReg.svh"
-`include "alu/alusrc.svh"
 `include "alu/alu.svh"
 `include "alu/reg_file.svh"
 `include "alu/data_mem.svh"
+`include "alu/jumpbranch.svh"
 
 
 // create top level module
@@ -19,7 +19,7 @@ module risc_v #(
     input logic rst,
     output logic [DATA_WIDTH-1:0] a0,
     output logic [DATA_WIDTH-1:0] instruction,
-    output logic [7:0] pc_addr
+    output logic [11:0] pc_addr
 );
 
 
@@ -47,7 +47,7 @@ logic [ADDRESS_WIDTH-1:0]  PCF, PCPlus4F;
 pcReg pcReg(
     .clk (clk),
     .rst (rst),
-    .PCF0 (PCsrcE ? (PCE+ImmExtE) : PCPlus4F),
+    .PCF0 (PCSrcE ? (PCE+ImmExtE) : PCPlus4F),
     .PCF (PCF)
 );
 
@@ -90,9 +90,8 @@ logic           ALUSrcD;
 logic [1:0]     ImmSrcD;
 logic [31:0]    RD1D, RD2D;
 logic [ADDRESS_WIDTH-1:0]   PCD, PCPlus4D;
-logic           RdD;
-logic           ImmExtD;
-logic [DATA_WIDTH-1:0]  a0;
+logic [4:0]     RdD;
+logic [DATA_WIDTH-1:0]  ImmExtD;
 
 
 control_unit #(DATA_WIDTH) my_control_unit(
@@ -102,7 +101,7 @@ control_unit #(DATA_WIDTH) my_control_unit(
     .MemWrite (MemWriteD),
     .Jump (JumpD),
     .Branch (BranchD),
-    .ALUControl (ALUControlD),
+    .ALUctrl (ALUControlD),
     .ALUsrc (ALUSrcD),
     .ImmSrc (ImmSrcD)
 );
@@ -125,6 +124,7 @@ sign_extend #(DATA_WIDTH) my_sign_extend(
     .ImmOp (ImmExtD)
 );
 
+assign RdD = instrD[11:7];
 
 always_ff @(posedge clk)
     begin
@@ -136,7 +136,7 @@ always_ff @(posedge clk)
         ALUControlE <= ALUControlD;
         ALUSrcE <= ALUSrcD;
         RD1E <= RD1D;
-        RD2D <= RD2D;
+        RD2E <= RD2D;
         PCE <= PCD;
         RdE <= RdD;
         ImmExtE <= ImmExtD;
@@ -174,8 +174,8 @@ logic           ALUSrcE;
 logic [1:0]     ImmSrcE;
 logic [31:0]    RD1E, RD2E;
 logic [ADDRESS_WIDTH-1:0]   PCE, PCPlus4E;
-logic           RdE;
-logic           ImmExtE;
+logic [4:0]     RdE;
+logic [DATA_WIDTH-1:0]  ImmExtE;
 
 // unique
 logic [ADDRESS_WIDTH-1:0] ALUResultE;
@@ -228,7 +228,7 @@ logic [1:0]                 ResultSrcM;
 logic                       MemWriteM;
 logic [ADDRESS_WIDTH-1:0]   ALUResultM, PCPlus4M;
 logic [DATA_WIDTH-1:0]      WriteDataM, ReadDataM;
-logic                       RdM;
+logic [4:0]                 RdM;
 
 data_mem #(ADDRESS_WIDTH, DATA_WIDTH) data_mem(
     .clk(clk),
@@ -264,19 +264,19 @@ logic                       RegWriteW;
 logic [1:0]                 ResultSrcW;
 logic [ADDRESS_WIDTH-1:0]   ALUResultW, PCPlus4W;
 logic [DATA_WIDTH-1:0]      ResultW, ReadDataW;
-logic                       RdW;
+logic [4:0]                 RdW;
 
     always_comb
         case (ResultSrcW)
             2'h0:   ResultW = ALUResultW;
             2'h1:   ResultW = ReadDataW;
             2'h2:   ResultW = PCPlus4W;
-            default: ResultW = {(DATA_WIDTH-1){1'b0}};
+            default: ResultW = {DATA_WIDTH{1'b0}};
         endcase
 
 
 // These logics are for testing output
-assign pc_addr = pc[7:0];
-assign instruction = instr;
+assign pc_addr = PCF[11:0];
+assign instruction = instrF;
 
 endmodule

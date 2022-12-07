@@ -8,7 +8,7 @@ module control_unit #(
     output  logic                       MemWrite,
     output  logic                       Jump,
     output  logic                       Branch,
-    output  logic   [2:0]               ALUControl,
+    output  logic   [2:0]               ALUctrl,
     output  logic                       ALUsrc,
     output  logic   [1:0]               ImmSrc
 );
@@ -73,8 +73,8 @@ module control_unit #(
     //MEMWrite
     always_comb
         case ({instr[6:0],instr[14:12]})
-            {7'b0100011, 3'b010}:   MEMWrite = 1'b1;
-            default:                MEMWrite = 1'b0;
+            {7'b0100011, 3'b010}:   MemWrite = 1'b1;
+            default:                MemWrite = 1'b0;
         endcase
 
     //ResultSrc

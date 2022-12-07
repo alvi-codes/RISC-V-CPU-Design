@@ -14,7 +14,7 @@ module instr_mem #(
 
     always_comb begin
         // async output
-        instr = rom_array[pc];
+        RD = rom_array[A];
     end
 
 endmodule
