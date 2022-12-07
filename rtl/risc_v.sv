@@ -138,15 +138,58 @@ always_ff @(posedge clk)
         * always_ff block has been created, just fill in
 */
 
+// pipeline IO
+logic [31:0]    instrE;
+logic           RegWriteE;
+logic [1:0]     ResultSrcE;
+logic           MemWriteE;
+logic           JumpE;
+logic           BranchE;
+logic [2:0]     ALUControlE;
+logic           ALUSrcE;
+logic [1:0]     ImmSrcE;
+logic [31:0]    RD1E, RD2E;
+logic [ADDRESS_WIDTH-1:0]   PCE, PCPlus4E;
+logic           RdE;
+logic           ImmExtE;
+
+// unique
+logic [ADDRESS_WIDTH-1:0] ALUResultE;
+logic           EQ;
+logic           PCSrcE;
+logic           ZeroE;
+
+alu alu (
+    .ALUop1 (RD1E),
+    .ALUop2 (ALUSrcE ? ImmExtE : RD2E),
+    .ALUctrl (ALUControlE),
+    .ALUout (ALUResultE),
+    .EQ (EQ),
+    .ZeroE (ZeroE)
+);
+
+jumpbranch jumpbranch(
+    .ZeroE (ZeroE),
+    .JumpE (JumpE),
+    .BranchE (BranchE),
+    .PCSrcE (PCSrcE)
+);
+
+// @ SHERMAINE, I don't really need to add a component here for the PC TargetE adder, you can just put it in your PC muxer later with PCE and ImmExtE
+
 always_ff @(posedge clk)
     begin
-        //Only add logic which must be going into the next block
-        //Once done remove all comments for your block and add any comments if neccessary
+        
+        // @JOHAN nonblocking or blocking assignments?
+        RegWriteM <= RegWriteE;
+        ResultSrcM <= ResultSrcE;
+        MemWriteM <= MemWriteE;
+        ALUResultM <= ALUResultE;
+        WriteDataM <= RD2E;
+        RdM <= RdE;
+        PCPlus4M <= PCPlus4E;
+    
     end
-
-
-
-
 
 
 // MEMORY Block

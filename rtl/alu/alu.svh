@@ -6,7 +6,8 @@ module alu #(
     input logic     [INPUT_WIDTH-1:0]   ALUop2,
     input logic     [CONTROL_WIDTH-1:0] ALUctrl,
     output logic    [INPUT_WIDTH-1:0]   ALUout,
-    output logic                        EQ // controlled by ALUctrl for branching
+    output logic                        EQ, // controlled by ALUctrl for branching
+    output logic                        ZeroE
 );
 
     always_comb
@@ -33,5 +34,7 @@ module alu #(
             3'h7:   EQ = 0;
         endcase
 
+    assign EQ = (ALUOp1 == ALUOp2);
+    assign ZeroE = (ALUOut == 32h'0);
     
 endmodule
