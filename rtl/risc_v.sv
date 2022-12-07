@@ -1,4 +1,4 @@
-// include all created components
+// Include All Created Components
 `include "control_unit/instr_mem/instr_mem.svh"
 `include "control_unit/control_unit/control_unit.svh"
 `include "control_unit/sign_extend/sign_extend.svh"
@@ -10,7 +10,11 @@
 `include "alu/jumpbranch.svh"
 
 
-// create top level module
+
+
+
+
+// Top Level Module
 module risc_v #(
     parameter ADDRESS_WIDTH = 32,
     parameter DATA_WIDTH = 32,
@@ -29,19 +33,6 @@ module risc_v #(
 
 
 // FETCH Block
-
-/*
-    Todo:
-        1) First create logics for each wire to be used in Fetch block
-        2) Use the right components from ones included as in the diagram
-        3) Fill the always_ff block by with: Data block logic <= Fetch block logic
-
-    Remember:
-        * All logic in your block must always end with F. example: PCF
-        * Each logic in always_ff must have same name with different suffix, example instrD <= instrF
-        * always_ff block has been created, just fill in
-*/
-
 logic [31:0]    instrF;
 logic [ADDRESS_WIDTH-1:0]  PCF, PCPlus4F;
 
@@ -52,10 +43,10 @@ pcReg pcReg(
     .PCF (PCF)
 );
 
-instr_mem #(MODIFIED_INSTR_MEM_WIDTH, DATA_WIDTH) instr_mem(   //Changing 12 to 32 generates a memory error: 
-                                            // %Error: test_instructions.mem:0: $readmem file address beyond bounds of array
-                                            // Aborting...
-                                            // Aborted (core dumped)
+instr_mem #(MODIFIED_INSTR_MEM_WIDTH, DATA_WIDTH) instr_mem(//Changing ADDRESS_WIDTH here to 32 generates a memory error: 
+                                                            // %Error: test_instructions.mem:0: $readmem file address beyond bounds of array
+                                                            // Aborting...
+                                                            // Aborted (core dumped)
     .A (PCF[MODIFIED_INSTR_MEM_WIDTH-1:0]),
     .RD (instrF)     
 );
@@ -78,8 +69,6 @@ always_ff @(posedge clk)
 
 
 // DATA Block
-
-
 logic [31:0]    instrD;
 logic           RegWriteD;
 logic [1:0]     ResultSrcD;
@@ -93,7 +82,6 @@ logic [31:0]    RD1D, RD2D;
 logic [ADDRESS_WIDTH-1:0]   PCD, PCPlus4D;
 logic [4:0]     RdD;
 logic [DATA_WIDTH-1:0]  ImmExtD;
-
 
 control_unit #(DATA_WIDTH) my_control_unit(
     .instr (instrD),
@@ -150,20 +138,6 @@ always_ff @(posedge clk)
 
 
 // EXECUTE Block
-
-/*
-    Todo:
-        1) First create logics for each wire to be used in Execute block
-        2) Use the right components from ones included as in the diagram
-        3) Fill the always_ff block by with: Memory block logic <= Execute block logic
-
-    Remember:
-        * All logic in your block must always end with E. example: ImmExtE
-        * Each logic in always_ff must have same name with different suffix, example ALUResultM <= ALUResultE
-        * always_ff block has been created, just fill in
-*/
-
-// pipeline IO
 logic [31:0]    instrE;
 logic           RegWriteE;
 logic [1:0]     ResultSrcE;
@@ -178,7 +152,6 @@ logic [ADDRESS_WIDTH-1:0]   PCE, PCPlus4E;
 logic [4:0]     RdE;
 logic [DATA_WIDTH-1:0]  ImmExtE;
 
-// unique
 logic [ADDRESS_WIDTH-1:0] ALUResultE;
 logic           PCSrcE;
 logic           ZeroE;
@@ -210,20 +183,11 @@ always_ff @(posedge clk)
     end
 
 
+
+
+
+
 // MEMORY Block
-
-/*
-    Todo:
-        1) First create logics for each wire to be used in Memory block
-        2) Use the right components from ones included as in the diagram
-        3) Fill the always_ff block by with: Write block logic <= Memory block logic
-
-    Remember:
-        * All logic in your block must always end with M. example: MemWriteM
-        * Each logic in always_ff must have same name with different suffix, example ReadDataW <= ReadDataM
-        * always_ff block has been created, just fill in
-*/
-
 logic                       RegWriteM;
 logic [1:0]                 ResultSrcM;
 logic                       MemWriteM;
@@ -249,18 +213,12 @@ always_ff @(posedge clk)
         PCPlus4W <= PCPlus4M;
     end
 
-// Write Block
 
-/*
-    Todo:
-        1) First create logics for each wire to be used in Write block
-        2) Use the right components from ones included as in the diagram
-        3) There is no delay in this block, so dont add always_ff
 
-    Remember:
-        * All logic in your block must always end with W. example: ReadDataW
-*/
 
+
+
+// WRITE Block
 logic                       RegWriteW;
 logic [1:0]                 ResultSrcW;
 logic [ADDRESS_WIDTH-1:0]   ALUResultW, PCPlus4W;
@@ -276,7 +234,11 @@ logic [4:0]                 RdW;
         endcase
 
 
-// These logics are for testing output
+
+
+
+
+//Logics For Output Testing
 assign pc_addr = PCF[MODIFIED_INSTR_MEM_WIDTH-1:0];
 assign instruction = instrF;
 
