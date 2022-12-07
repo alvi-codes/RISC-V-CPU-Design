@@ -20,7 +20,7 @@ module risc_v #(
     input logic rst,
     output logic [DATA_WIDTH-1:0] a0,
     output logic [DATA_WIDTH-1:0] instruction,
-    output logic [11:0] pc_addr
+    output logic [MODIFIED_INSTR_MEM_WIDTH-1:0] pc_addr
 );
 
 
@@ -233,7 +233,7 @@ logic [4:0]                 RdM;
 
 data_mem #(MODIFIED_INSTR_MEM_WIDTH, DATA_WIDTH) data_mem(
     .clk(clk),
-    .A(ALUResultM),
+    .A(ALUResultM[MODIFIED_INSTR_MEM_WIDTH-1:0]),
     .WE(MemWriteM),
     .WD(WriteDataM),
     .RD(ReadDataM)
