@@ -13,7 +13,8 @@
 // create top level module
 module risc_v #(
     parameter ADDRESS_WIDTH = 32,
-    parameter DATA_WIDTH = 32
+    parameter DATA_WIDTH = 32,
+    parameter MODIFIED_INSTR_MEM_WIDTH = 8
 )(
     input logic clk,
     input logic rst,
@@ -51,11 +52,11 @@ pcReg pcReg(
     .PCF (PCF)
 );
 
-instr_mem #(12, DATA_WIDTH) instr_mem(   //Changing 12 to 32 generates a memory error: 
+instr_mem #(MODIFIED_INSTR_MEM_WIDTH, DATA_WIDTH) instr_mem(   //Changing 12 to 32 generates a memory error: 
                                             // %Error: test_instructions.mem:0: $readmem file address beyond bounds of array
                                             // Aborting...
                                             // Aborted (core dumped)
-    .A (PCF[11:0]),
+    .A (PCF[MODIFIED_INSTR_MEM_WIDTH-1:0]),
     .RD (instrF)     
 );
 
@@ -230,7 +231,7 @@ logic [ADDRESS_WIDTH-1:0]   ALUResultM, PCPlus4M;
 logic [DATA_WIDTH-1:0]      WriteDataM, ReadDataM;
 logic [4:0]                 RdM;
 
-data_mem #(ADDRESS_WIDTH, DATA_WIDTH) data_mem(
+data_mem #(MODIFIED_INSTR_MEM_WIDTH, DATA_WIDTH) data_mem(
     .clk(clk),
     .A(ALUResultM),
     .WE(MemWriteM),
@@ -276,7 +277,7 @@ logic [4:0]                 RdW;
 
 
 // These logics are for testing output
-assign pc_addr = PCF[11:0];
+assign pc_addr = PCF[MODIFIED_INSTR_MEM_WIDTH-1:0];
 assign instruction = instrF;
 
 endmodule
