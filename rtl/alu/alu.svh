@@ -6,8 +6,7 @@ module alu #(
     input logic     [INPUT_WIDTH-1:0]   ALUop2,
     input logic     [CONTROL_WIDTH-1:0] ALUctrl,
     output logic    [INPUT_WIDTH-1:0]   ALUout,
-    output logic                        EQ, // controlled by ALUctrl for branching
-    output logic                        ZeroE
+    output logic                        ZeroE  // controlled by ALUctrl for branching
 );
 
     always_comb
@@ -24,17 +23,15 @@ module alu #(
 
     always_comb
         case (ALUctrl)
-            3'h0:   EQ = ALUop1 == ALUop2;
-            3'h1:   EQ = ALUop1 != ALUop2;
-            3'h2:   EQ = ALUop1 < ALUop2;
-            3'h3:   EQ = ALUop1 >= ALUop2;
-            3'h4:   EQ = 0;
-            3'h5:   EQ = 0;
-            3'h6:   EQ = 0;
-            3'h7:   EQ = 0;
+            3'h0:   ZeroE = ALUop1 == ALUop2;
+            3'h1:   ZeroE = ALUop1 != ALUop2;
+            3'h2:   ZeroE = ALUop1 < ALUop2;
+            3'h3:   ZeroE = ALUop1 >= ALUop2;
+            3'h4:   ZeroE = 0;
+            3'h5:   ZeroE = 0;
+            3'h6:   ZeroE = 0;
+            3'h7:   ZeroE = 0;
         endcase
 
-    assign EQ = (ALUOp1 == ALUOp2);
-    assign ZeroE = (ALUOut == 32h'0);
     
 endmodule

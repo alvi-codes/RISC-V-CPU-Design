@@ -80,9 +80,9 @@ module control_unit #(
     //ResultSrc
     always_comb 
         casez ({instr[6:0],instr[14:12]})
-            {7'b0000011, 3'b010}:   ResultSrc = 1'b01;
-            {7'b1101111, 3'b???}:   ResultSrc = 1'b10;
-            default:                ResultSrc = 1'b00;
+            {7'b0000011, 3'b010}:   ResultSrc = 2'b01;
+            {7'b1101111, 3'b???}:   ResultSrc = 2'b10;
+            default:                ResultSrc = 2'b00;
         endcase
 
             

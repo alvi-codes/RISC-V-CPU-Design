@@ -12,7 +12,7 @@
 
 // create top level module
 module risc_v #(
-    parameter ADDRESS_WIDTH = 8,
+    parameter ADDRESS_WIDTH = 32,
     parameter DATA_WIDTH = 32
 )(
     input logic clk,
@@ -42,10 +42,7 @@ module risc_v #(
 */
 
 logic [31:0]    instrF;
-logic           PCSrcE;
-logic           ImmExtE;
-logic [ADDRESS_WIDTH-1:0]   PCE;
-logic [ADDRESS_WIDTH-1:0]   PCF, PCPlus4F;
+logic [ADDRESS_WIDTH-1:0]  PCF, PCPlus4F;
 
 pcReg pcReg(
     .clk (clk),
@@ -54,15 +51,18 @@ pcReg pcReg(
     .PCF (PCF)
 );
 
-instr_mem #(ADDRESS_WIDTH, DATA_WIDTH) instr_mem(
-    .A (PCF),
+instr_mem #(12, DATA_WIDTH) instr_mem(   //Changing 12 to 32 generates a memory error: 
+                                            // %Error: test_instructions.mem:0: $readmem file address beyond bounds of array
+                                            // Aborting...
+                                            // Aborted (core dumped)
+    .A (PCF[11:0]),
     .RD (instrF)     
 );
 
 adder adder(
     .PCF (PCF),
     .PCPlus4F (PCPlus4F)
-)
+);
 
 always_ff @(posedge clk)
     begin
@@ -179,7 +179,6 @@ logic           ImmExtE;
 
 // unique
 logic [ADDRESS_WIDTH-1:0] ALUResultE;
-logic           EQ;
 logic           PCSrcE;
 logic           ZeroE;
 
@@ -188,7 +187,6 @@ alu alu (
     .ALUop2 (ALUSrcE ? ImmExtE : RD2E),
     .ALUctrl (ALUControlE),
     .ALUout (ALUResultE),
-    .EQ (EQ),
     .ZeroE (ZeroE)
 );
 
@@ -198,8 +196,6 @@ jumpbranch jumpbranch(
     .BranchE (BranchE),
     .PCSrcE (PCSrcE)
 );
-
-// @ SHERMAINE, I don't really need to add a component here for the PC TargetE adder, you can just put it in your PC muxer later with PCE and ImmExtE
 
 always_ff @(posedge clk)
     begin
@@ -227,16 +223,30 @@ always_ff @(posedge clk)
         * always_ff block has been created, just fill in
 */
 
+logic                       RegWriteM;
+logic [1:0]                 ResultSrcM;
+logic                       MemWriteM;
+logic [ADDRESS_WIDTH-1:0]   ALUResultM, PCPlus4M;
+logic [DATA_WIDTH-1:0]      WriteDataM, ReadDataM;
+logic                       RdM;
+
+data_mem #(ADDRESS_WIDTH, DATA_WIDTH) data_mem(
+    .clk(clk),
+    .A(ALUResultM),
+    .WE(MemWriteM),
+    .WD(WriteDataM),
+    .RD(ReadDataM)
+);
+
 always_ff @(posedge clk)
     begin
-        //Only add logic which must be going into the next block
-        //Once done remove all comments for your block and add any comments if neccessary
+        RegWriteW <= RegWriteM;
+        ResultSrcW <= ResultSrcM;
+        ALUResultW <= ALUResultM;
+        ReadDataW <= ReadDataM;
+        RdW <= RdM;
+        PCPlus4W <= PCPlus4M;
     end
-
-
-
-
-
 
 // Write Block
 
@@ -250,8 +260,19 @@ always_ff @(posedge clk)
         * All logic in your block must always end with W. example: ReadDataW
 */
 
+logic                       RegWriteW;
+logic [1:0]                 ResultSrcW;
+logic [ADDRESS_WIDTH-1:0]   ALUResultW, PCPlus4W;
+logic [DATA_WIDTH-1:0]      ResultW, ReadDataW;
+logic                       RdW;
 
-
+    always_comb
+        case (ResultSrcW)
+            2'h0:   ResultW = ALUResultW;
+            2'h1:   ResultW = ReadDataW;
+            2'h2:   ResultW = PCPlus4W;
+            default: ResultW = {(DATA_WIDTH-1){1'b0}};
+        endcase
 
 
 // These logics are for testing output
