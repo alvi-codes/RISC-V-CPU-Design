@@ -33,11 +33,11 @@ module risc_v #(
     Todo:
         1) First create logics for each wire to be used in Fetch block
         2) Use the right components from ones included as in the diagram
-        3) Fill the always_ff block by with: Data block logic = Fetch block logic
+        3) Fill the always_ff block by with: Data block logic <= Fetch block logic
 
     Remember:
         * All logic in your block must always end with F. example: PCF
-        * Each logic in always_ff must have same name with different suffix, example instrF = instrD
+        * Each logic in always_ff must have same name with different suffix, example instrD <= instrF
         * always_ff block has been created, just fill in
 */
 
@@ -104,19 +104,19 @@ sign_extend #(DATA_WIDTH) my_sign_extend(
 
 always_ff @(posedge clk)
     begin
-        RegWriteE = RegWriteD;
-        ResultSrcE = ResultSrcD;
-        MemWriteE = MemWriteD;
-        JumpE = JumpD;
-        BranchE = BranchD;
-        ALUControlE = ALUControlD;
-        ALUSrcE = ALUSrcD;
-        RD1E = RD1D;
-        RD2D = RD2D;
-        PCE = PCD;
-        RdE = RdD;
-        ImmExtE = ImmExtD;
-        PCPlus4E = PCPlus4D;
+        RegWriteE <= RegWriteD;
+        ResultSrcE <= ResultSrcD;
+        MemWriteE <= MemWriteD;
+        JumpE <= JumpD;
+        BranchE <= BranchD;
+        ALUControlE <= ALUControlD;
+        ALUSrcE <= ALUSrcD;
+        RD1E <= RD1D;
+        RD2D <= RD2D;
+        PCE <= PCD;
+        RdE <= RdD;
+        ImmExtE <= ImmExtD;
+        PCPlus4E <= PCPlus4D;
     end
 
 
@@ -130,11 +130,11 @@ always_ff @(posedge clk)
     Todo:
         1) First create logics for each wire to be used in Execute block
         2) Use the right components from ones included as in the diagram
-        3) Fill the always_ff block by with: Memory block logic = Execute block logic
+        3) Fill the always_ff block by with: Memory block logic <= Execute block logic
 
     Remember:
         * All logic in your block must always end with E. example: ImmExtE
-        * Each logic in always_ff must have same name with different suffix, example ALUResultM = ALUResultE
+        * Each logic in always_ff must have same name with different suffix, example ALUResultM <= ALUResultE
         * always_ff block has been created, just fill in
 */
 
@@ -179,8 +179,6 @@ jumpbranch jumpbranch(
 
 always_ff @(posedge clk)
     begin
-        
-        // @JOHAN nonblocking or blocking assignments?
         RegWriteM <= RegWriteE;
         ResultSrcM <= ResultSrcE;
         MemWriteM <= MemWriteE;
@@ -188,7 +186,6 @@ always_ff @(posedge clk)
         WriteDataM <= RD2E;
         RdM <= RdE;
         PCPlus4M <= PCPlus4E;
-    
     end
 
 
@@ -198,11 +195,11 @@ always_ff @(posedge clk)
     Todo:
         1) First create logics for each wire to be used in Memory block
         2) Use the right components from ones included as in the diagram
-        3) Fill the always_ff block by with: Write block logic = Memory block logic
+        3) Fill the always_ff block by with: Write block logic <= Memory block logic
 
     Remember:
         * All logic in your block must always end with M. example: MemWriteM
-        * Each logic in always_ff must have same name with different suffix, example ReadDataW = ReadDataM
+        * Each logic in always_ff must have same name with different suffix, example ReadDataW <= ReadDataM
         * always_ff block has been created, just fill in
 */
 
