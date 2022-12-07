@@ -41,10 +41,34 @@ module risc_v #(
         * always_ff block has been created, just fill in
 */
 
+logic [31:0]    instrF;
+logic           PCSrcE;
+logic           ImmExtE;
+logic [ADDRESS_WIDTH-1:0]   PCE;
+logic [ADDRESS_WIDTH-1:0]   PCF, PCPlus4F;
+
+pcReg pcReg(
+    .clk (clk),
+    .rst (rst),
+    .PCF0 (PCsrcE ? (PCE+ImmExtE) : PCPlus4F),
+    .PCF (PCF)
+);
+
+instr_mem #(ADDRESS_WIDTH, DATA_WIDTH) instr_mem(
+    .A (PCF),
+    .RD (instrF)     
+);
+
+adder adder(
+    .PCF (PCF),
+    .PCPlus4F (PCPlus4F)
+)
+
 always_ff @(posedge clk)
     begin
-        //Only add logic which must be going into the next block
-        //Once done remove all comments for your block and add any comments if neccessary
+        instrD <= instrF;
+        PCD <= PCF;
+        PCPlus4D <= PCPlus4F;
     end
 
 
