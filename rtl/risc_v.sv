@@ -74,6 +74,7 @@ logic [31:0]    RD1D, RD2D;
 logic [ADDRESS_WIDTH-1:0]   PCD, PCPlus4D;
 logic [4:0]     RdD;
 logic [DATA_WIDTH-1:0]  ImmExtD;
+logic           Jump2D;
 
 control_unit #(DATA_WIDTH) my_control_unit(
     .instr (instrD),
@@ -85,6 +86,7 @@ control_unit #(DATA_WIDTH) my_control_unit(
     .ALUctrl (ALUControlD),
     .ALUsrc (ALUSrcD),
     .ImmSrc (ImmSrcD)
+    .Jump2(Jump2D)
 );
 
 reg_file #(5, DATA_WIDTH)reg_file (
@@ -122,6 +124,7 @@ always_ff @(posedge clk)
         RdE <= RdD;
         ImmExtE <= ImmExtD;
         PCPlus4E <= PCPlus4D;
+        Jump2E <= Jump2D;
     end
 
 
@@ -145,6 +148,7 @@ logic [DATA_WIDTH-1:0]  ImmExtE;
 logic [ADDRESS_WIDTH-1:0] ALUResultE;
 logic           PCSrcE;
 logic           ZeroE;
+logic           Jump2E;
 
 alu alu (
     .ALUop1 (RD1E),
