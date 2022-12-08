@@ -19,6 +19,7 @@ module control_unit #(
             {7'b0000011, 3'b???}:   RegWrite = 1'b1;
             {7'b0010011, 3'b???}:   RegWrite = 1'b1;
             {7'b1100111, 3'b000}:   RegWrite = 1'b1;
+            {7'b1101111, 3'b???}:   RegWrite = 1'b1;
             default: RegWrite = 1'b0;
         endcase
 
