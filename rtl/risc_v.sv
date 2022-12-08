@@ -85,7 +85,7 @@ control_unit #(DATA_WIDTH) my_control_unit(
     .Branch (BranchD),
     .ALUctrl (ALUControlD),
     .ALUsrc (ALUSrcD),
-    .ImmSrc (ImmSrcD)
+    .ImmSrc (ImmSrcD),
     .Jump2(Jump2D)
 );
 
