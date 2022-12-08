@@ -12,7 +12,6 @@ Distributed the work for this pipelined CPU as per the highlighted blocks above:
 |Data|Johan Jino|
 |Execute|Clemen Kok|
 |Memory & Write|Sohailul Islam Alvi|
-|
 
 Committed all our works into the `pipeline` branch.
 
