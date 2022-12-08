@@ -12,8 +12,6 @@
 
 
 
-
-
 // Top Level Module
 module risc_v #(
     parameter ADDRESS_WIDTH = 32,
@@ -30,8 +28,6 @@ module risc_v #(
 
 
 
-
-
 // FETCH Block
 logic [31:0]    instrF;
 logic [ADDRESS_WIDTH-1:0]  PCF, PCPlus4F;
@@ -43,10 +39,7 @@ pcReg pcReg(
     .PCF (PCF)
 );
 
-instr_mem #(MODIFIED_INSTR_MEM_WIDTH, DATA_WIDTH) instr_mem(//Changing ADDRESS_WIDTH here to 32 generates a memory error: 
-                                                            // %Error: test_instructions.mem:0: $readmem file address beyond bounds of array
-                                                            // Aborting...
-                                                            // Aborted (core dumped)
+instr_mem #(MODIFIED_INSTR_MEM_WIDTH, DATA_WIDTH) instr_mem(
     .A (PCF[MODIFIED_INSTR_MEM_WIDTH-1:0]),
     .RD (instrF)     
 );
@@ -62,8 +55,6 @@ always_ff @(posedge clk)
         PCD <= PCF;
         PCPlus4D <= PCPlus4F;
     end
-
-
 
 
 
@@ -135,8 +126,6 @@ always_ff @(posedge clk)
 
 
 
-
-
 // EXECUTE Block
 logic [31:0]    instrE;
 logic           RegWriteE;
@@ -185,8 +174,6 @@ always_ff @(posedge clk)
 
 
 
-
-
 // MEMORY Block
 logic                       RegWriteM;
 logic [1:0]                 ResultSrcM;
@@ -216,8 +203,6 @@ always_ff @(posedge clk)
 
 
 
-
-
 // WRITE Block
 logic                       RegWriteW;
 logic [1:0]                 ResultSrcW;
@@ -225,20 +210,18 @@ logic [ADDRESS_WIDTH-1:0]   ALUResultW, PCPlus4W;
 logic [DATA_WIDTH-1:0]      ResultW, ReadDataW;
 logic [4:0]                 RdW;
 
-    always_comb
-        case (ResultSrcW)
-            2'h0:   ResultW = ALUResultW;
-            2'h1:   ResultW = ReadDataW;
-            2'h2:   ResultW = PCPlus4W;
-            default: ResultW = {DATA_WIDTH{1'b0}};
-        endcase
+always_comb
+    case (ResultSrcW)
+        2'h0:   ResultW = ALUResultW;
+        2'h1:   ResultW = ReadDataW;
+        2'h2:   ResultW = PCPlus4W;
+        default: ResultW = {DATA_WIDTH{1'b0}};
+    endcase
 
 
 
 
-
-
-//Logics For Output Testing
+//Test Output Logics
 assign pc_addr = PCF[MODIFIED_INSTR_MEM_WIDTH-1:0];
 assign instruction = instrF;
 
