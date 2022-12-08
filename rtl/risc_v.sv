@@ -25,9 +25,6 @@ module risc_v #(
     output logic [MODIFIED_INSTR_MEM_WIDTH-1:0] pc_addr
 );
 
-
-
-
 // FETCH Block
 logic [31:0]    instrF;
 logic [ADDRESS_WIDTH-1:0]  PCF, PCPlus4F;
@@ -35,7 +32,11 @@ logic [ADDRESS_WIDTH-1:0]  PCF, PCPlus4F;
 pcReg pcReg(
     .clk (clk),
     .rst (rst),
-    .PCF0 (PCSrcE ? (PCE+ImmExtE) : PCPlus4F),
+    .PCF0 (Jump2E ? ALUResultE : (PCSrcE ? (PCE+ImmExtE) : PCPlus4F)), 
+    // if Jump2E == 1: PCF0==ALUResultE
+    // else: 
+    // if PCSrcE == 1: PCF0==PCE+ImmExtE (this happens when Jump2E==0 and PCSrcE==1)
+    // else: PCF0==PCPlus4F (this happens when Jump2E==0 and PCSrcE==0)
     .PCF (PCF)
 );
 
