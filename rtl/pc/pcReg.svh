@@ -3,13 +3,13 @@ module pcReg #(
 )(
     input logic clk, 
     input logic rst, 
-    input logic [WIDTH-1:0] next_PC,
-    output logic [WIDTH-1:0] pc
+    input logic [WIDTH-1:0] PCF0,
+    output logic [WIDTH-1:0] PCF
 );
 
 always_ff @ (posedge clk)
     begin
-    if (rst) pc <= {WIDTH{1'b0}};
-    else pc <= next_PC;
+    if (rst) PCF <= {WIDTH{1'b0}};
+    else PCF <= PCF0;
     end
 endmodule

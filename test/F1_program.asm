@@ -1,7 +1,11 @@
 main:
 	jal a1, iloop
+    nop
+    nop
     addi a2, zero, 0x0
     beq a2, zero, 0
+    nop 
+    nop
     
 iloop:
 	lw a0, 0(zero)
@@ -17,9 +21,11 @@ iloop:
     nop
     lw a0, 8(zero)
     jalr a3, a1, 0
+    nop 
+    nop
     
  mloop:
  	beq a2, zero, mloop
+    nop
+    nop
     
-    
-
