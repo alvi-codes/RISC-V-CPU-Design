@@ -194,14 +194,14 @@ data_cache data_cache(
     .V (V),
     .tag (tag),
     .data (data)
-)
+);
 
 cachebranch cachebranch(
     .tag (tag),
     .V (V),
     .memAddrTag (ALUResultM[ADDRESS_WIDTH-1:5]),
     .hit (hit)
-)
+);
 
 
 data_mem #(MODIFIED_INSTR_MEM_WIDTH, DATA_WIDTH) data_mem(
