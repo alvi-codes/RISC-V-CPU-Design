@@ -7,7 +7,7 @@ Clemen and Shermaine working on Data Cache HDL.
 Alvi and Johan testing Data Cache.
 
 Drawing of how we envision the data cache to work with the Pipelined CPU:
-![Alt text](data_cache_drawing.png)
+![Alt text](data_cache_drawing.jpg)
 
 Shermaine:
 1. Added `data_cache.svh` and `cachebranch.svh`.
