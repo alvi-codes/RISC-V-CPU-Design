@@ -185,31 +185,43 @@ logic                       RegWriteM;
 logic [1:0]                 ResultSrcM;
 logic                       MemWriteM;
 logic [ADDRESS_WIDTH-1:0]   ALUResultM, PCPlus4M;
-logic [DATA_WIDTH-1:0]      WriteDataM, ReadDataM;
+logic [DATA_WIDTH-1:0]      WriteDataM, ReadDataMemory;
 logic [4:0]                 RdM;
 
-//data cache additional blocks
+// DATA CACHE implementation: note that the team was unable to complete testing due to a lack of time; the approach is outlined in README.md.
+logic                       CacheHit;
+logic                       V;
+logic                       tag;
+logic [DATA_WIDTH-1:0]      ReadDataCache;
+
+// direct mapped data cache is added to enable fast reads by caching recently accessed data.
+// SET is used as a proxy address; V is used to check if the memory location has been accessed previously (0 on startup); Tag is used to verify if the data is indeed what the instruction is looking for.
 data_cache data_cache(
+    .clk (clk), 
     .set (ALUResultM[4:2]),
     .V (V),
     .tag (tag),
-    .data (data)
+    .WE (!CacheHit && !MemWriteM), // WRITE ENABLE triggered when there is a miss - data write on next rising edge && when the instruction does not require write
+    .WD (ReadDataMemory), 
+    .RD (ReadDataCache)
 );
 
+// Various logic implemented to identify Hit or Miss.
 cachebranch cachebranch(
     .tag (tag),
     .V (V),
     .memAddrTag (ALUResultM[ADDRESS_WIDTH-1:5]),
-    .hit (hit)
+    .hit (CacheHit)
 );
 
-
+// If we Miss (CacheHit == 0), then re-route to data_mem (for write operations, we just go straight to data_mem), where we repeat the process.
+// Cache is updated with missing data. Thus, future reads will not miss, enabling fast reads.
 data_mem #(MODIFIED_INSTR_MEM_WIDTH, DATA_WIDTH) data_mem(
     .clk(clk),
-    .A(hit ? data : ALUResultM), //changed this
+    .set (ALUResultM[4:2]),
     .WE(MemWriteM),
     .WD(WriteDataM),
-    .RD(ReadDataM)
+    .RD(ReadDataMemory)
 );
 
 always_ff @(posedge clk)
@@ -217,7 +229,7 @@ always_ff @(posedge clk)
         RegWriteW <= RegWriteM;
         ResultSrcW <= ResultSrcM;
         ALUResultW <= ALUResultM;
-        ReadDataW <= ReadDataM;
+        ReadDataW <= (CacheHit ? ReadDataCache : ReadDataMemory);
         RdW <= RdM;
         PCPlus4W <= PCPlus4M;
     end
