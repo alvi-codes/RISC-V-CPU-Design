@@ -1,5 +1,5 @@
-# Test Results & Proof of Success - Pipleined
-This page displays the test programmes used to verify our design and the resultant outputs seen on the waveform viewer that prooves the correctness of our CPU design implemnetation working as per the needs of this course work.
+# Test Results & Proof of Success - Pipelined
+This page displays the test programmes used to verify our design and the resultant outputs seen on the waveform viewer that proves the correctness of our CPU design implementation working as per the needs of this coursework.
 
 In addition, we have also added videos that show the outputs for the F1 Program driving the neopixel bar on VBuddy and the trace values for the Reference Program plotted on the VBuddy's TFT display.
 
