@@ -46,6 +46,11 @@ Resultant waveform view from the `risc_v.vcd` file:
 
 Outputs from `a0` driving the neopixel bar on VBuddy:
 
+
+https://user-images.githubusercontent.com/94545356/207894205-ea9e3988-8e03-4997-ae90-bb5cdb93f60d.mp4
+
+
+
 # Reference Program
 
 
