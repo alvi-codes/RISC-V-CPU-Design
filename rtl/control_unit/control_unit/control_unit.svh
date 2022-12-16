@@ -68,14 +68,14 @@ module control_unit #(
             default         Branch = 1'b0;
         endcase
     
-    //Jump
+    //Jump for JAL
     always_comb
         case ({instr[6:0]})
             {7'b1101111}:   Jump = 1'b1;
             default         Jump = 1'b0;
         endcase
 
-    //Jump2
+    //Jump2 for JALR
     always_comb
         case ({instr[6:0],instr[14:12]})
             {7'b1100111, 3'b000}:   Jump2 = 1'b1;
