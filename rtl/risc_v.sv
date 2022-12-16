@@ -75,6 +75,10 @@ logic [ADDRESS_WIDTH-1:0]   PCD, PCPlus4D;
 logic [4:0]     RdD;
 logic [DATA_WIDTH-1:0]  ImmExtD;
 logic           Jump2D;
+logic           LUISig;
+logic [ADDRESS_WIDTH-1:0] lui_rd;
+
+assign lui_rd = {instr[31:12], 12b'0};
 
 control_unit #(DATA_WIDTH) my_control_unit(
     .instr (instrD),
@@ -86,7 +90,8 @@ control_unit #(DATA_WIDTH) my_control_unit(
     .ALUctrl (ALUControlD),
     .ALUsrc (ALUSrcD),
     .ImmSrc (ImmSrcD),
-    .Jump2(Jump2D)
+    .Jump2(Jump2D),
+    .LUISig (LUISig)
 );
 
 reg_file #(5, DATA_WIDTH)reg_file (
@@ -95,7 +100,7 @@ reg_file #(5, DATA_WIDTH)reg_file (
     .AD2 (instrD[24:20]),
     .AD3 (RdW),
     .WE3 (RegWriteW),
-    .WD3 (ResultW),
+    .WD3 (LUISig ? (lui_rd) : (ResultW)),
     .RD1 (RD1D),
     .RD2 (RD2D),
     .a0 (a0)
