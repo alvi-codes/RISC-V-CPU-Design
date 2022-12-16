@@ -64,7 +64,8 @@ always_ff @(posedge clk)
 logic [31:0]    instrD;
 logic           RegWriteD;
 logic [1:0]     ResultSrcD;
-logic           MemWriteD;
+logic [3:0]     MemWriteD;
+logic [2:0]     MemReadD;
 logic           JumpD;
 logic           BranchD;
 logic [2:0]     ALUControlD;
@@ -75,23 +76,24 @@ logic [ADDRESS_WIDTH-1:0]   PCD, PCPlus4D;
 logic [4:0]     RdD;
 logic [DATA_WIDTH-1:0]  ImmExtD;
 logic           Jump2D;
-logic           LUISig;
-logic [ADDRESS_WIDTH-1:0] lui_rd;
+logic           LUISigD;
+logic [ADDRESS_WIDTH-1:0] lui_rdD;
 
-assign lui_rd = {instr[31:12], 12b'0};
+assign lui_rdD = {instrD[31:12], 12'b0};
 
 control_unit #(DATA_WIDTH) my_control_unit(
     .instr (instrD),
     .RegWrite (RegWriteD),
     .ResultSrc (ResultSrcD),
     .MemWrite (MemWriteD),
+    .MemRead (MemReadD),
     .Jump (JumpD),
     .Branch (BranchD),
     .ALUctrl (ALUControlD),
     .ALUsrc (ALUSrcD),
     .ImmSrc (ImmSrcD),
     .Jump2(Jump2D),
-    .LUISig (LUISig)
+    .LUISig (LUISigD)
 );
 
 reg_file #(5, DATA_WIDTH)reg_file (
@@ -100,7 +102,7 @@ reg_file #(5, DATA_WIDTH)reg_file (
     .AD2 (instrD[24:20]),
     .AD3 (RdW),
     .WE3 (RegWriteW),
-    .WD3 (LUISig ? (lui_rd) : (ResultW)),
+    .WD3 (LUISigW ? (lui_rdW) : (ResultW)),
     .RD1 (RD1D),
     .RD2 (RD2D),
     .a0 (a0)
@@ -119,6 +121,7 @@ always_ff @(posedge clk)
         RegWriteE <= RegWriteD;
         ResultSrcE <= ResultSrcD;
         MemWriteE <= MemWriteD;
+        MemReadE <= MemReadD;
         JumpE <= JumpD;
         BranchE <= BranchD;
         ALUControlE <= ALUControlD;
@@ -130,6 +133,9 @@ always_ff @(posedge clk)
         ImmExtE <= ImmExtD;
         PCPlus4E <= PCPlus4D;
         Jump2E <= Jump2D;
+        LUISigE <= LUISigD;
+        lui_rdE <= lui_rdD;
+
     end
 
 
@@ -139,7 +145,8 @@ always_ff @(posedge clk)
 logic [31:0]    instrE;
 logic           RegWriteE;
 logic [1:0]     ResultSrcE;
-logic           MemWriteE;
+logic [3:0]     MemWriteE;
+logic [2:0]     MemReadE;
 logic           JumpE;
 logic           BranchE;
 logic [2:0]     ALUControlE;
@@ -154,6 +161,8 @@ logic [ADDRESS_WIDTH-1:0] ALUResultE;
 logic           PCSrcE;
 logic           ZeroE;
 logic           Jump2E;
+logic           LUISigE;
+logic [ADDRESS_WIDTH-1:0] lui_rdE;
 
 alu alu (
     .ALUop1 (RD1E),
@@ -175,10 +184,13 @@ always_ff @(posedge clk)
         RegWriteM <= RegWriteE;
         ResultSrcM <= ResultSrcE;
         MemWriteM <= MemWriteE;
+        MemReadM <= MemReadE;
         ALUResultM <= ALUResultE;
         WriteDataM <= RD2E;
         RdM <= RdE;
         PCPlus4M <= PCPlus4E;
+        LUISigM <= LUISigE;
+        lui_rdM <= lui_rdE;
     end
 
 
@@ -187,16 +199,23 @@ always_ff @(posedge clk)
 // MEMORY Block
 logic                       RegWriteM;
 logic [1:0]                 ResultSrcM;
-logic                       MemWriteM;
+logic [3:0]                 MemWriteM;
+logic [2:0]                 MemReadM;
 logic [ADDRESS_WIDTH-1:0]   ALUResultM, PCPlus4M;
 logic [DATA_WIDTH-1:0]      WriteDataM, ReadDataM;
 logic [4:0]                 RdM;
+logic           LUISigM;
+logic [ADDRESS_WIDTH-1:0] lui_rdM;
 
 data_mem #(MODIFIED_INSTR_MEM_WIDTH, DATA_WIDTH) data_mem(
     .clk(clk),
     .A(ALUResultM[MODIFIED_INSTR_MEM_WIDTH-1:0]),
     .WE(MemWriteM),
-    .WD(WriteDataM),
+    .RE(MemReadM),
+    .WD1(WriteDataM[7:0]),
+    .WD2(WriteDataM[15:8]),
+    .WD3(WriteDataM[23:16]),
+    .WD4(WriteDataM[31:24]),
     .RD(ReadDataM)
 );
 
@@ -208,6 +227,8 @@ always_ff @(posedge clk)
         ReadDataW <= ReadDataM;
         RdW <= RdM;
         PCPlus4W <= PCPlus4M;
+        LUISigW <= LUISigM;
+        lui_rdW <= lui_rdM;
     end
 
 
@@ -219,6 +240,8 @@ logic [1:0]                 ResultSrcW;
 logic [ADDRESS_WIDTH-1:0]   ALUResultW, PCPlus4W;
 logic [DATA_WIDTH-1:0]      ResultW, ReadDataW;
 logic [4:0]                 RdW;
+logic           LUISigW;
+logic [ADDRESS_WIDTH-1:0] lui_rdW;
 
 always_comb
     case (ResultSrcW)
