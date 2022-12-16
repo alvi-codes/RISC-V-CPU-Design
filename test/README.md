@@ -53,4 +53,13 @@ https://user-images.githubusercontent.com/94545356/207894205-ea9e3988-8e03-4997-
 
 # Reference Program
 
+Resultant waveform view from the `risc_v.vcd` file:
 
+### Sine ###
+![Alt text](images/pipeline_ref_sine.png)
+### Triangle ###
+![Alt text](images/pipeline_ref_triangle.png)
+### Gaussian ###
+![Alt text](images/pipeline_ref_gaussian.png)
+### Noisy ###
+![Alt text](images/pipeline_ref_noisy.png)
