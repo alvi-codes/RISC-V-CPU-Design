@@ -1,5 +1,8 @@
 
-# **Team 8 IAC RISC-V CPU Coursework**
+# **Multistage Pipelined RV32I CPU Design**
+
+![pipelined_cpu_blocks](https://github.com/alvi-codes/RISC-V-CPU/assets/94545356/aaf6cf48-b321-4113-9513-3091e27f820e)
+
 
 **Team Members:**
 ```
